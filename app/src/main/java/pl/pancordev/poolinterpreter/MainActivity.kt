@@ -3,15 +3,14 @@ package pl.pancordev.poolinterpreter
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.act_main.*
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.LoaderCallbackInterface
-import org.opencv.android.OpenCVLoader
 import org.opencv.core.Mat
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -24,7 +23,7 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
         val self = this
         managerCallback = object : BaseLoaderCallback(this) {
             override fun onManagerConnected(status: Int) {
-                Log.d("TAG", "OpenCV manager connection status: $status")
+                Timber.d("OpenCV manager connection status: $status")
                 when (status) {
                     LoaderCallbackInterface.SUCCESS ->  ActivityCompat.requestPermissions(self, arrayOf(Manifest.permission.CAMERA), 1)
                     else ->  super.onManagerConnected(status)
@@ -32,21 +31,14 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
             }
         }
         cameraView.setCvCameraViewListener(this)
-
-        if (OpenCVLoader.initDebug()) {
-            managerCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
-        } else {
-            Log.e("TAG", "Failed to static initialize OpenCV")
-            OpenCVLoader.initAsync("4.3.0", this, managerCallback)
-        }
     }
 
     override fun onCameraViewStarted(width: Int, height: Int) {
-        Log.d("TAG", "CameraView started")
+        Timber.d("CameraView started")
     }
 
     override fun onCameraViewStopped() {
-        Log.d("TAG", "CameraView stopped")
+        Timber.d("CameraView stopped")
     }
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
@@ -57,11 +49,11 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
         when (requestCode) {
             1 ->
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("TAG", "Camera permissions granted")
+                    Timber.d("Camera permissions granted")
                     cameraView.setCameraPermissionGranted()
                     cameraView.enableView()
                 } else {
-                    Log.e("TAG", "Permissions not granted for camera")
+                    Timber.e("Permissions not granted for camera")
                 }
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
