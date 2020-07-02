@@ -9,9 +9,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         if (!OpenCVLoader.initDebug()) {
-            Log.e("OpenCV", "Could not initialize OpenCV")
+            Log.e("OpenCV", "Could not initialize")
         } else {
-            Log.d("OpenCV", "OpenCV initialized")
+            Log.d("OpenCV", "Initialized")
         }
     }
 }
