@@ -21,7 +21,8 @@ class GameplayActivity : AppCompatActivity(), GameplayContract.View {
     }
 
     override fun onImageProcessingReady() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), GameplayPresenter.CAMERA_PERMISSION_CODE)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+            GameplayPresenter.CAMERA_PERMISSION_CODE)
     }
 
     override fun setCameraListener(listener: CameraBridgeViewBase.CvCameraViewListener2) {
@@ -33,7 +34,8 @@ class GameplayActivity : AppCompatActivity(), GameplayContract.View {
         cameraView.enableView()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         gameplayPresenter.setResult(requestCode, permissions, grantResults)
     }
