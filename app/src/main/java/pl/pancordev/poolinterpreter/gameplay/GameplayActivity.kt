@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.act_gameplay.*
 import org.opencv.android.CameraBridgeViewBase
 import pl.pancordev.poolinterpreter.R
+import pl.pancordev.poolinterpreter.imageprocessing.table.TableManagerImpl
 
 class GameplayActivity : AppCompatActivity(), GameplayContract.View {
 
@@ -16,7 +17,7 @@ class GameplayActivity : AppCompatActivity(), GameplayContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.act_gameplay)
 
-        gameplayPresenter = GameplayPresenter(this)
+        gameplayPresenter = GameplayPresenter(this, TableManagerImpl())
         gameplayPresenter.onViewReady()
     }
 

@@ -3,10 +3,16 @@ package pl.pancordev.poolinterpreter.gameplay
 import android.content.pm.PackageManager
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.OpenCVLoader
+import org.opencv.core.CvType
 import org.opencv.core.Mat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.Scalar
+import org.opencv.imgproc.Imgproc
+import pl.pancordev.poolinterpreter.imageprocessing.table.TableContract
 import timber.log.Timber
 
-class GameplayPresenter constructor(private val gameplayView: GameplayContract.View) :
+class GameplayPresenter constructor(private val gameplayView: GameplayContract.View,
+                                    private val tableManager: TableContract.TableManager) :
     GameplayContract.Presenter, CameraBridgeViewBase.CvCameraViewListener2 {
 
     companion object {
@@ -50,6 +56,17 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     }
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
-        return inputFrame.rgba()
+        Timber.e("EJJJJJJJJ")
+        val mat = inputFrame.rgba()
+        val points = tableManager.getTable(mat)
+        val tablePoints = MatOfPoint(*points)
+        Timber.e("Points: $tablePoints")
+        val mask = Mat.zeros(mat.size(), CvType.CV_8UC1)
+        Imgproc.fillPoly(mask, listOf(tablePoints), Scalar(255.0, 255.0, 255.0))
+
+        val croped = Mat(mat.size(), CvType.CV_8UC1)
+        mat.copyTo(croped, mask)
+
+        return croped
     }
 }
