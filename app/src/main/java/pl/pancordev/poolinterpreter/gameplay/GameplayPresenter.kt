@@ -61,7 +61,7 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         val points = tableManager.getTable(mat)
 
         val tablePoints = MatOfPoint(*points)
-        Timber.d("Found table points: $tablePoints")
+        Timber.d("Found table points: ${points.size}")
         val mask = Mat.zeros(mat.size(), CvType.CV_8UC1)
         Imgproc.fillPoly(mask, listOf(tablePoints), Scalar(255.0, 255.0, 255.0))
 
@@ -69,5 +69,6 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         mat.copyTo(cropped, mask)
 
         return cropped
+        //return tableManager.hackView()
     }
 }

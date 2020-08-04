@@ -19,9 +19,10 @@ class TableManagerImpl : TableContract.TableManager {
         //convert to hsv with blur
         val hsvMat = Mat()
         Imgproc.cvtColor(resizedMat, hsvMat, Imgproc.COLOR_BGR2HSV)
-        val blurredMat = Mat()
-        Imgproc.GaussianBlur(hsvMat, blurredMat, Size(5.0, 5.0), 0.0)
 
+        val blurredMat = hsvMat
+        //Imgproc.GaussianBlur(hsvMat, blurredMat, Size(5.0, 5.0), 0.0)
+        hacked = blurredMat
         //find main color in region of interest
         val circle = Rect(blurredMat.width() / 2, blurredMat.height() / 2, blurredMat.width() / 4,blurredMat.height() / 4)
         val roi = Mat(blurredMat, circle)
@@ -37,8 +38,8 @@ class TableManagerImpl : TableContract.TableManager {
 
     private fun getTableContours(table: Mat, tableColor: Double): Array<Point> {
         val thresh = Mat()
-        Core.inRange(table, Scalar(tableColor - 10, 0.0, 0.0), Scalar(tableColor + 10, 255.0, 255.0), thresh)
-        hacked = table
+        Core.inRange(table, Scalar(tableColor - 5, 0.0, 0.0), Scalar(tableColor + 5, 255.0, 255.0), thresh)
+
         val allContours: List<MatOfPoint> = mutableListOf()
         val hierarchy = Mat()
         Imgproc.findContours(thresh, allContours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
@@ -56,7 +57,8 @@ class TableManagerImpl : TableContract.TableManager {
         if (allContours.isNotEmpty()) {
             val points = allContours[maxIndex].toArray()
 
-            val epsilon = 0.03 * Imgproc.arcLength(MatOfPoint2f(*points), true)
+            val epsilon = 0.07 * Imgproc.arcLength(MatOfPoint2f(*points), true)
+            Timber.e("arcLength: ${Imgproc.arcLength(MatOfPoint2f(*points), true)} epsilon: $epsilon")
             Imgproc.approxPolyDP(MatOfPoint2f(*points), rectPoints, epsilon, true)
 
             val pts = rectPoints.toArray()
