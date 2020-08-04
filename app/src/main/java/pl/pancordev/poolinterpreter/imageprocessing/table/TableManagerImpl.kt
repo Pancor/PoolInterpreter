@@ -2,13 +2,14 @@ package pl.pancordev.poolinterpreter.imageprocessing.table
 
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import timber.log.Timber
 
 class TableManagerImpl : TableContract.TableManager {
 
     private var ratio = 0.0
+    private var hacked = Mat()
 
     override fun getTable(mat: Mat): Array<Point> {
-
         //resize image
         val resizedMat = Mat()
         val newSize = Size(mat.size().width * 0.1, mat.size().height * 0.1)
@@ -31,13 +32,23 @@ class TableManagerImpl : TableContract.TableManager {
         val tableColor = minMaxLocResult.maxLoc.y
         tableColor
 
-        return getTableContours(resizedMat, tableColor)
+        Timber.e("Table color: $tableColor")
+
+        return getTableContours(blurredMat, tableColor)
+    }
+
+    override fun hackView(): Mat {
+        val resizedMat = Mat()
+        val newSize = Size(hacked.size().width * 10, hacked.size().height * 10)
+        Imgproc.resize(hacked, resizedMat, newSize)
+
+        return resizedMat
     }
 
     private fun getTableContours(table: Mat, tableColor: Double): Array<Point> {
         val thresh = Mat()
         Core.inRange(table, Scalar(tableColor - 10, 0.0, 0.0), Scalar(tableColor + 10, 255.0, 255.0), thresh)
-
+        hacked = table
         val allContours: List<MatOfPoint> = mutableListOf()
         val hierarchy = Mat()
         Imgproc.findContours(thresh, allContours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
@@ -52,6 +63,7 @@ class TableManagerImpl : TableContract.TableManager {
             }
         }
         val rectPoints = MatOfPoint2f()
+        Timber.e("allContours: ${allContours.size}")
         if (allContours.isNotEmpty()) {
             val points = allContours[maxIndex].toArray()
 

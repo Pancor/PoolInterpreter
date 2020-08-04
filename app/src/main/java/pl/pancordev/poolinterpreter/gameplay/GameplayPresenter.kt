@@ -41,6 +41,7 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.d("Camera permissions granted")
                     gameplayView.onCameraPermissionsGranted()
+                    gameplayView.setCameraListener(this)
                 } else {
                     Timber.e("Permissions not granted for camera")
                 }
@@ -56,17 +57,17 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     }
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
-        Timber.e("EJJJJJJJJ")
         val mat = inputFrame.rgba()
         val points = tableManager.getTable(mat)
+
         val tablePoints = MatOfPoint(*points)
-        Timber.e("Points: $tablePoints")
+        Timber.d("Found table points: $tablePoints")
         val mask = Mat.zeros(mat.size(), CvType.CV_8UC1)
         Imgproc.fillPoly(mask, listOf(tablePoints), Scalar(255.0, 255.0, 255.0))
 
-        val croped = Mat(mat.size(), CvType.CV_8UC1)
-        mat.copyTo(croped, mask)
+        val cropped = Mat(mat.size(), CvType.CV_8UC1)
+        mat.copyTo(cropped, mask)
 
-        return croped
+        return cropped
     }
 }

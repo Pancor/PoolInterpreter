@@ -8,5 +8,7 @@ interface TableContract {
     interface TableManager {
 
         fun getTable(mat: Mat): Array<Point>
+
+        fun hackView(): Mat
     }
 }
