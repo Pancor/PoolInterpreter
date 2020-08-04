@@ -15,34 +15,24 @@ class TableManagerImpl : TableContract.TableManager {
         val newSize = Size(mat.size().width * 0.1, mat.size().height * 0.1)
         Imgproc.resize(mat, resizedMat, newSize)
         ratio = mat.size().width / resizedMat.size().width //TODO: store resizing ratio for future calculations of drawing proper scale of contours
-        resizedMat
 
         //convert to hsv with blur
         val hsvMat = Mat()
         Imgproc.cvtColor(resizedMat, hsvMat, Imgproc.COLOR_BGR2HSV)
         val blurredMat = Mat()
         Imgproc.GaussianBlur(hsvMat, blurredMat, Size(5.0, 5.0), 0.0)
-        blurredMat
 
+        //find main color in region of interest
         val circle = Rect(blurredMat.width() / 2, blurredMat.height() / 2, blurredMat.width() / 4,blurredMat.height() / 4)
         val roi = Mat(blurredMat, circle)
         val hist = Mat()
         Imgproc.calcHist(listOf(roi), MatOfInt(0), Mat(), hist, MatOfInt(180), MatOfFloat(0f, 180f))
         val minMaxLocResult = Core.minMaxLoc(hist)
         val tableColor = minMaxLocResult.maxLoc.y
-        tableColor
 
-        Timber.e("Table color: $tableColor")
+        Timber.d("Table color: $tableColor")
 
         return getTableContours(blurredMat, tableColor)
-    }
-
-    override fun hackView(): Mat {
-        val resizedMat = Mat()
-        val newSize = Size(hacked.size().width * 10, hacked.size().height * 10)
-        Imgproc.resize(hacked, resizedMat, newSize)
-
-        return resizedMat
     }
 
     private fun getTableContours(table: Mat, tableColor: Double): Array<Point> {
@@ -63,7 +53,6 @@ class TableManagerImpl : TableContract.TableManager {
             }
         }
         val rectPoints = MatOfPoint2f()
-        Timber.e("allContours: ${allContours.size}")
         if (allContours.isNotEmpty()) {
             val points = allContours[maxIndex].toArray()
 
@@ -80,5 +69,14 @@ class TableManagerImpl : TableContract.TableManager {
             return pts
         }
         return emptyArray()
+    }
+
+    //it is bypass for showing current mat, do not use it in production
+    override fun hackView(): Mat {
+        val resizedMat = Mat()
+        val newSize = Size(hacked.size().width * 10, hacked.size().height * 10)
+        Imgproc.resize(hacked, resizedMat, newSize)
+
+        return resizedMat
     }
 }
