@@ -20,12 +20,11 @@ class TableManagerImpl : TableContract.TableManager {
         val hsvMat = Mat()
         Imgproc.cvtColor(resizedMat, hsvMat, Imgproc.COLOR_BGR2HSV)
 
-        val blurredMat = hsvMat
-        //Imgproc.GaussianBlur(hsvMat, blurredMat, Size(5.0, 5.0), 0.0)
-        hacked = blurredMat
+        //TODO: Remove noise from hsv so contours of table don't 'jump'
+
         //find main color in region of interest
-        val circle = Rect(blurredMat.width() / 2, blurredMat.height() / 2, blurredMat.width() / 4,blurredMat.height() / 4)
-        val roi = Mat(blurredMat, circle)
+        val circle = Rect(hsvMat.width() / 2, hsvMat.height() / 2, hsvMat.width() / 4,hsvMat.height() / 4)
+        val roi = Mat(hsvMat, circle)
         val hist = Mat()
         Imgproc.calcHist(listOf(roi), MatOfInt(0), Mat(), hist, MatOfInt(180), MatOfFloat(0f, 180f))
         val minMaxLocResult = Core.minMaxLoc(hist)
@@ -33,7 +32,7 @@ class TableManagerImpl : TableContract.TableManager {
 
         Timber.d("Table color: $tableColor")
 
-        return getTableContours(blurredMat, tableColor)
+        return getTableContours(hsvMat, tableColor)
     }
 
     private fun getTableContours(table: Mat, tableColor: Double): Array<Point> {
@@ -57,7 +56,7 @@ class TableManagerImpl : TableContract.TableManager {
         if (allContours.isNotEmpty()) {
             val points = allContours[maxIndex].toArray()
 
-            val epsilon = 0.07 * Imgproc.arcLength(MatOfPoint2f(*points), true)
+            val epsilon = 0.05 * Imgproc.arcLength(MatOfPoint2f(*points), true)
             Timber.e("arcLength: ${Imgproc.arcLength(MatOfPoint2f(*points), true)} epsilon: $epsilon")
             Imgproc.approxPolyDP(MatOfPoint2f(*points), rectPoints, epsilon, true)
 
@@ -76,7 +75,7 @@ class TableManagerImpl : TableContract.TableManager {
     //it is bypass for showing current mat, do not use it in production
     override fun hackView(): Mat {
         val resizedMat = Mat()
-        val newSize = Size(hacked.size().width * 10, hacked.size().height * 10)
+        val newSize = Size(hacked.size().width * ratio, hacked.size().height * ratio)
         Imgproc.resize(hacked, resizedMat, newSize)
 
         return resizedMat

@@ -69,6 +69,6 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         mat.copyTo(cropped, mask)
 
         return cropped
-        //return tableManager.hackView()
+        return tableManager.hackView()
     }
 }
