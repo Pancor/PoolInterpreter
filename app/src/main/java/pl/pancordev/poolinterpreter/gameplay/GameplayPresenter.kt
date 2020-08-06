@@ -57,7 +57,13 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     }
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
-        val mat = inputFrame.rgba()
+        val table = table(inputFrame.rgba())
+
+        return table
+        return tableManager.hackView()
+    }
+
+    private fun table(mat: Mat): Mat {
         val points = tableManager.getTable(mat)
 
         val tablePoints = MatOfPoint(*points)
@@ -69,6 +75,5 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         mat.copyTo(cropped, mask)
 
         return cropped
-        return tableManager.hackView()
     }
 }

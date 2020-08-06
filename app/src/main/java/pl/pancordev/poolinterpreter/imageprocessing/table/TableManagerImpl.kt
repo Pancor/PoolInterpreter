@@ -72,7 +72,6 @@ class TableManagerImpl : TableContract.TableManager {
         return emptyArray()
     }
 
-    //it is bypass for showing current mat, do not use it in production
     override fun hackView(): Mat {
         val resizedMat = Mat()
         val newSize = Size(hacked.size().width * ratio, hacked.size().height * ratio)
