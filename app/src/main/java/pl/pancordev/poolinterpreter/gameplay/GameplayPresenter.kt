@@ -8,11 +8,13 @@ import org.opencv.core.Mat
 import org.opencv.core.MatOfPoint
 import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
+import pl.pancordev.poolinterpreter.imageprocessing.balls.BallsContract
 import pl.pancordev.poolinterpreter.imageprocessing.table.TableContract
 import timber.log.Timber
 
 class GameplayPresenter constructor(private val gameplayView: GameplayContract.View,
-                                    private val tableManager: TableContract.TableManager) :
+                                    private val tableManager: TableContract.TableManager,
+                                    private val ballsManager: BallsContract.BallsManager) :
     GameplayContract.Presenter, CameraBridgeViewBase.CvCameraViewListener2 {
 
     companion object {
@@ -58,9 +60,9 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
         val table = table(inputFrame.rgba())
-
-        return table
-        return tableManager.hackView()
+        ballsManager.getBalls(table)
+        //return table
+        return ballsManager.hackView()
     }
 
     private fun table(mat: Mat): Mat {
