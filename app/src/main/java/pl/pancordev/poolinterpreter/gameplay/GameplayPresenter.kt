@@ -8,11 +8,14 @@ import org.opencv.core.Mat
 import org.opencv.core.MatOfPoint
 import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
+import pl.pancordev.poolinterpreter.imageprocessing.balls.Ball
+import pl.pancordev.poolinterpreter.imageprocessing.balls.BallsContract
 import pl.pancordev.poolinterpreter.imageprocessing.table.TableContract
 import timber.log.Timber
 
 class GameplayPresenter constructor(private val gameplayView: GameplayContract.View,
-                                    private val tableManager: TableContract.TableManager) :
+                                    private val tableManager: TableContract.TableManager,
+                                    private val ballsManager: BallsContract.BallsManager) :
     GameplayContract.Presenter, CameraBridgeViewBase.CvCameraViewListener2 {
 
     companion object {
@@ -57,7 +60,15 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     }
 
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
-        val mat = inputFrame.rgba()
+        val table = table(inputFrame.rgba())
+        val balls = ballsManager.getBalls(table)
+        val drawnBalls = balls(table, balls)
+
+        //return table
+        return drawnBalls
+    }
+
+    private fun table(mat: Mat): Mat {
         val points = tableManager.getTable(mat)
 
         val tablePoints = MatOfPoint(*points)
@@ -69,6 +80,13 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         mat.copyTo(cropped, mask)
 
         return cropped
-        return tableManager.hackView()
+    }
+
+    private fun balls(mat: Mat, balls: List<Ball>): Mat {
+        balls.forEach { ball -> 
+            Imgproc.circle(mat, ball.center, ball.radius, Scalar(255.0, 0.0, 255.0), 
+                3, 8, 0)
+        }
+        return mat
     }
 }
