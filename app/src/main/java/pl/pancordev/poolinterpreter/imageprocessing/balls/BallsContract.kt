@@ -7,6 +7,6 @@ interface BallsContract {
 
     interface BallsManager: BypassHack {
 
-        fun getBalls(mat: Mat)
+        fun getBalls(mat: Mat): List<Ball>
     }
 }

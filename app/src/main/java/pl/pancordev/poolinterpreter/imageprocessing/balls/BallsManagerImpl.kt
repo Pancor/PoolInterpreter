@@ -9,7 +9,7 @@ class BallsManagerImpl : BallsContract.BallsManager {
     private var ratio = 0.0
     private var hacked = Mat()
 
-    override fun getBalls(mat: Mat) {
+    override fun getBalls(mat: Mat): List<Ball> {
         val resizedMat = Mat()
         val newSize = Size(mat.size().width * 0.5, mat.size().height * 0.5)
         Imgproc.resize(mat, resizedMat, newSize)
@@ -19,7 +19,10 @@ class BallsManagerImpl : BallsContract.BallsManager {
         Imgproc.cvtColor(resizedMat, greyscale, Imgproc.COLOR_BGR2GRAY)
 
         val blurred = Mat()
-        Imgproc.blur(greyscale, blurred, Size(6.0,6.0))
+        Imgproc.blur(greyscale, blurred, Size(3.0,3.0))
+
+//        val canny = Mat()
+//        Imgproc.Canny(blurred, canny, 25.0, 50.0)
 
         val circles = Mat()
         Imgproc.HoughCircles(blurred, circles, Imgproc.HOUGH_GRADIENT, 1.0,
@@ -27,16 +30,17 @@ class BallsManagerImpl : BallsContract.BallsManager {
             5, 13)
         Timber.d("Found ${circles.cols()} balls")
 
-        val size = if (circles.cols() > 17) { 17 } else { circles.cols() }
+        val balls = mutableListOf<Ball>()
+        val size = if (circles.cols() > 16) { 16 } else { circles.cols() }
         for (x in 0 until size) { //16 because there is only 16 balls
             val c = circles.get(0, x)
             val center = Point(Math.round(c[0]*ratio).toDouble(), Math.round(c[1]*ratio).toDouble())
             val radius = Math.round(c[2]*ratio).toInt()
-            Imgproc.circle(mat, center, radius, Scalar(255.0, 0.0, 255.0),
-                3, 8, 0)
+            balls.add(Ball(center, radius))
         }
 
         hacked = mat
+        return balls
     }
 
     override fun hackView(): Mat {
