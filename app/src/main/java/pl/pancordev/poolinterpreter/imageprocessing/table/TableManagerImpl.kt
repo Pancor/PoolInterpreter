@@ -57,7 +57,6 @@ class TableManagerImpl : TableContract.TableManager {
             val points = allContours[maxIndex].toArray()
 
             val epsilon = 0.05 * Imgproc.arcLength(MatOfPoint2f(*points), true)
-            Timber.e("arcLength: ${Imgproc.arcLength(MatOfPoint2f(*points), true)} epsilon: $epsilon")
             Imgproc.approxPolyDP(MatOfPoint2f(*points), rectPoints, epsilon, true)
 
             val pts = rectPoints.toArray()
