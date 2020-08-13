@@ -18,7 +18,7 @@ class TableManagerImpl : TableContract.TableManager {
 
         //convert to hsv with blur
         val hsvMat = Mat()
-        Imgproc.cvtColor(resizedMat, hsvMat, Imgproc.COLOR_BGR2HSV)
+        Imgproc.cvtColor(resizedMat, hsvMat, Imgproc.COLOR_RGB2HSV)
 
         //TODO: Remove noise from hsv so contours of table don't 'jump'
 
