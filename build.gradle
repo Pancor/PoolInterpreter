@@ -19,6 +19,14 @@ allprojects {
         google()
         jcenter()
     }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name.startsWith("lint")) {
+            if (project.name == "opencv") {
+                android.lintOptions.abortOnError = false
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {
