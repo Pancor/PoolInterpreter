@@ -8,6 +8,6 @@ interface TableContract {
 
     interface TableManager: BypassHack {
 
-        fun getTable(mat: Mat): Array<Point>
+        fun getTable(mat: Mat): List<Point>
     }
 }

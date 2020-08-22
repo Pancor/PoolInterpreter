@@ -9,12 +9,12 @@ class TableManagerImpl : TableContract.TableManager {
     private var ratio = 0.0
     private var hacked = Mat()
 
-    override fun getTable(mat: Mat): Array<Point> {
+    override fun getTable(mat: Mat): List<Point> {
         //resize image
         val resizedMat = Mat()
         val newSize = Size(mat.size().width * 0.1, mat.size().height * 0.1)
         Imgproc.resize(mat, resizedMat, newSize)
-        ratio = mat.size().width / resizedMat.size().width //TODO: store resizing ratio for future calculations of drawing proper scale of contours
+        ratio = mat.size().width / resizedMat.size().width
 
         //convert to hsv with blur
         val hsvMat = Mat()
@@ -35,7 +35,7 @@ class TableManagerImpl : TableContract.TableManager {
         return getTableContours(hsvMat, tableColor)
     }
 
-    private fun getTableContours(table: Mat, tableColor: Double): Array<Point> {
+    private fun getTableContours(table: Mat, tableColor: Double): List<Point> {
         val thresh = Mat()
         Core.inRange(table, Scalar(tableColor - 5, 0.0, 0.0), Scalar(tableColor + 5, 255.0, 255.0), thresh)
 
@@ -66,9 +66,9 @@ class TableManagerImpl : TableContract.TableManager {
                     point.y *= ratio
                 }
             }
-            return pts
+            return pts.toList()
         }
-        return emptyArray()
+        return emptyList()
     }
 
     override fun hackView(): Mat {

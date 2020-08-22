@@ -21,8 +21,6 @@ interface GameplayContract {
 
         fun onViewReady()
 
-        fun processImage(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat
-
         fun setResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
     }
 }

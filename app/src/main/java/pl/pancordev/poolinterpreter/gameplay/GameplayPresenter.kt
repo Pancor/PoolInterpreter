@@ -32,10 +32,6 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         }
     }
 
-    override fun processImage(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
-        return inputFrame.gray()
-    }
-
     override fun setResult(requestCode: Int, permissions: Array<out String>,
                            grantResults: IntArray) {
         when (requestCode) {
@@ -72,7 +68,8 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     private fun table(mat: Mat): Mat {
         val points = tableManager.getTable(mat)
 
-        val tablePoints = MatOfPoint(*points)
+        MatOfPoint()
+        val tablePoints = MatOfPoint(*points.toTypedArray())
         Timber.d("Found table points: ${points.size}")
         val mask = Mat.zeros(mat.size(), CvType.CV_8UC1)
         Imgproc.fillPoly(mask, listOf(tablePoints), Scalar(255.0, 255.0, 255.0))
