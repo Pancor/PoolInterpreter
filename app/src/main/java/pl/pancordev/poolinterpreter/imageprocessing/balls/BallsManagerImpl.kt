@@ -6,9 +6,10 @@ import timber.log.Timber
 
 class BallsManagerImpl : BallsContract.BallsManager {
 
+    private val ballTrackerImpl =  BallTrackerImpl()
+
     private var ratio = 0.0
     private var hacked = Mat()
-    var balls = mutableListOf<Ball>()
 
     override fun getBalls(mat: Mat): List<Ball> {
         val resizedMat = Mat()
@@ -28,7 +29,7 @@ class BallsManagerImpl : BallsContract.BallsManager {
             8, 13)
         Timber.d("Found ${circles.cols()} balls")
 
-        balls.clear()
+        val balls = mutableListOf<Ball>()
         //val size = if (circles.cols() > 16) { 16 } else { circles.cols() }
         val size = if (circles.cols() > 9) { 9 } else { circles.cols() }
         for (x in 0 until size) {
@@ -105,34 +106,32 @@ class BallsManagerImpl : BallsContract.BallsManager {
             if (ball.ballColor2 < 50) {
                 ball.color = BallType.WHITE
             }
-            isStriped(ball)
-        }
 
-        for (ball in balls) {
+            for (it in balls) {
+                if (it.color == ball.color && it.id != ball.id ) {
+                    if (ball.whiteArea > it.whiteArea) {
+                        ball.isStriped = true
+                    } else if (ball.whiteArea < it.whiteArea) {
+                        it.isStriped = true
+                    }
+                }
+            }
+        }
+        val trackedBalls = ballTrackerImpl.update(balls)
+
+        for ((key, ball) in trackedBalls) {
             Imgproc.circle(mat, ball.center, ball.radius, Scalar(255.0, 0.0, 255.0),
                 3, 8, 0)
 
             val textPoint = Point(ball.center.x + 20, ball.center.y + 10)
             if (ball.color != BallType.UNKNOWN) {
-                Imgproc.putText(mat, "(${ball.ballColor1}, ${ball.ballColor2}, ${ball.ballColor3}) ${ball.color.name} ${ball.whiteArea}, ${ball.isStriped}", textPoint, Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, Scalar(255.0, 0.0, 255.0), 2)
+                Imgproc.putText(mat, "#${key} (${ball.ballColor1}, ${ball.ballColor2}, ${ball.ballColor3}) ${ball.color.name} ${ball.whiteArea}, ${ball.isStriped}", textPoint, Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, Scalar(255.0, 0.0, 255.0), 2)
             } else {
                 Imgproc.putText(mat, "(${ball.ballColor1}, ${ball.ballColor2}, ${ball.ballColor3})", textPoint, Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, Scalar(255.0, 0.0, 255.0), 2)
             }
         }
         hacked = mat
-        return balls
-    }
-
-    private fun isStriped(ball: Ball) {
-        for (it in balls) {
-            if (it.color == ball.color && it.id != ball.id ) {
-                if (ball.whiteArea > it.whiteArea) {
-                    ball.isStriped = true
-                } else if (ball.whiteArea < it.whiteArea) {
-                    it.isStriped = true
-                }
-            }
-        }
+        return balls //do not trust this balls
     }
 
     override fun recogniseBall(ball: Mat) {
