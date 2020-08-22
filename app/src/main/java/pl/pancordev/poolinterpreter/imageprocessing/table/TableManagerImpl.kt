@@ -6,15 +6,22 @@ import timber.log.Timber
 
 class TableManagerImpl : TableContract.TableManager {
 
-    private var ratio = 0.0
     private var hacked = Mat()
+
+    private fun resizeImage(imageToResize: Mat, percentage: Double): Resized {
+        val resizedImage = Mat()
+
+        val imageSize = imageToResize.size()
+        val newSize = Size(imageSize.width * percentage, imageSize.height * percentage)
+        Imgproc.resize(imageToResize, resizedImage, newSize)
+
+        val originalImageSizeToResizedRatio = imageSize.width / resizedImage.size().width
+        return Resized(resizedImage, originalImageSizeToResizedRatio)
+    }
 
     override fun getTable(mat: Mat): List<Point> {
         //resize image
-        val resizedMat = Mat()
-        val newSize = Size(mat.size().width * 0.1, mat.size().height * 0.1)
-        Imgproc.resize(mat, resizedMat, newSize)
-        ratio = mat.size().width / resizedMat.size().width
+        val resizedMat = resizeImage(mat, 0.1).resizedImage
 
         //convert to hsv with blur
         val hsvMat = Mat()
@@ -62,8 +69,8 @@ class TableManagerImpl : TableContract.TableManager {
             val pts = rectPoints.toArray()
             pts.forEach { point ->
                 run {
-                    point.x *= ratio
-                    point.y *= ratio
+//                    point.x *= originalImageSizeToResizedRatio
+//                    point.y *= originalImageSizeToResizedRatio    //TODO: obtain ratio
                 }
             }
             return pts.toList()
@@ -73,9 +80,11 @@ class TableManagerImpl : TableContract.TableManager {
 
     override fun hackView(): Mat {
         val resizedMat = Mat()
-        val newSize = Size(hacked.size().width * ratio, hacked.size().height * ratio)
-        Imgproc.resize(hacked, resizedMat, newSize)
+//        val newSize = Size(hacked.size().width * originalImageSizeToResizedRatio, hacked.size().height * originalImageSizeToResizedRatio) //TODO: obtain ratio
+//        Imgproc.resize(hacked, resizedMat, newSize)
 
         return resizedMat
     }
+
+    data class Resized(val resizedImage: Mat, val originalImageSizeToResizedRatio: Double)
 }

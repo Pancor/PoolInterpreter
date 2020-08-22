@@ -1,7 +1,6 @@
 package pl.pancordev.poolinterpreter.gameplay
 
 import org.opencv.android.CameraBridgeViewBase
-import org.opencv.core.Mat
 
 interface GameplayContract {
 
