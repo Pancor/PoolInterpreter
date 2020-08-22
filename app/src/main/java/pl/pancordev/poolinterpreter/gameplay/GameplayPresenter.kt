@@ -65,7 +65,8 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
         val drawnBalls = balls(table, balls)
 
         //return table
-        return drawnBalls
+        //return drawnBalls
+        return ballsManager.hackView()
     }
 
     private fun table(mat: Mat): Mat {
@@ -83,8 +84,8 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     }
 
     private fun balls(mat: Mat, balls: List<Ball>): Mat {
-        balls.forEach { ball -> 
-            Imgproc.circle(mat, ball.center, ball.radius, Scalar(255.0, 0.0, 255.0), 
+        balls.forEach { ball ->
+            Imgproc.circle(mat, ball.center, ball.radius, Scalar(255.0, 0.0, 255.0),
                 3, 8, 0)
         }
         return mat

@@ -3,7 +3,6 @@ package pl.pancordev.poolinterpreter.gameplay
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.core.Mat
 
-
 interface GameplayContract {
 
     val cameraPermissionCode: Int
@@ -16,7 +15,6 @@ interface GameplayContract {
         fun setCameraListener(listener: CameraBridgeViewBase.CvCameraViewListener2)
 
         fun onCameraPermissionsGranted()
-
     }
 
     interface Presenter {

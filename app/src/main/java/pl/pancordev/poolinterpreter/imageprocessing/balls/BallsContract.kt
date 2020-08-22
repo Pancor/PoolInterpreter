@@ -8,5 +8,7 @@ interface BallsContract {
     interface BallsManager: BypassHack {
 
         fun getBalls(mat: Mat): List<Ball>
+
+        fun recogniseBall(ball: Mat)
     }
 }
