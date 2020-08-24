@@ -68,9 +68,11 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
     private fun table(mat: Mat): Mat {
         val points = tableManager.getTable(mat)
 
-        MatOfPoint()
         val tablePoints = MatOfPoint(*points.toTypedArray())
         Timber.d("Found table points: ${points.size}")
+        if (points.isEmpty()) {
+            return mat
+        }
         val mask = Mat.zeros(mat.size(), CvType.CV_8UC1)
         Imgproc.fillPoly(mask, listOf(tablePoints), Scalar(255.0, 255.0, 255.0))
 
