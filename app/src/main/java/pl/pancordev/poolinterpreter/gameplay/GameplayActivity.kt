@@ -9,6 +9,7 @@ import org.opencv.android.CameraBridgeViewBase
 import pl.pancordev.poolinterpreter.R
 import pl.pancordev.poolinterpreter.imageprocessing.balls.BallsManagerImpl
 import pl.pancordev.poolinterpreter.imageprocessing.table.TableManagerImpl
+import pl.pancordev.poolinterpreter.imageprocessing.tools.ImageProcessingServiceImpl
 
 class GameplayActivity : AppCompatActivity(), GameplayContract.View {
 
@@ -18,7 +19,7 @@ class GameplayActivity : AppCompatActivity(), GameplayContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.act_gameplay)
 
-        gameplayPresenter = GameplayPresenter(this, TableManagerImpl(),
+        gameplayPresenter = GameplayPresenter(this, TableManagerImpl(ImageProcessingServiceImpl()),
             BallsManagerImpl())
         gameplayPresenter.onViewReady()
     }

@@ -7,7 +7,6 @@ import pl.pancordev.poolinterpreter.imageprocessing.table.TableManagerImpl
 class ImageProcessingManager(private val tableManagerImpl: TableManagerImpl) {
 
     fun obtainTableCoordinates(image: Mat): List<Point> {
-        tableManagerImpl.getTable(image)
-        return emptyList()
+        return tableManagerImpl.getTable(image)
     }
 }
