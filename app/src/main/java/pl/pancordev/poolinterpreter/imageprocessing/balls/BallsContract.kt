@@ -9,6 +9,6 @@ interface BallsContract {
 
         fun getBalls(mat: Mat): List<Ball>
 
-        fun recogniseBall(ball: Mat)
+        fun recogniseBall(circles: List<Ball>, image: Mat): List<Ball>
     }
 }

@@ -20,7 +20,7 @@ class GameplayActivity : AppCompatActivity(), GameplayContract.View {
         setContentView(R.layout.act_gameplay)
 
         gameplayPresenter = GameplayPresenter(this, TableManagerImpl(ImageProcessingServiceImpl()),
-            BallsManagerImpl())
+            BallsManagerImpl(ImageProcessingServiceImpl()))
         gameplayPresenter.onViewReady()
     }
 

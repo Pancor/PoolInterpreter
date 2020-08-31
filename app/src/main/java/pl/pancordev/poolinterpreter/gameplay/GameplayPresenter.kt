@@ -84,7 +84,7 @@ class GameplayPresenter constructor(private val gameplayView: GameplayContract.V
 
     private fun balls(mat: Mat, balls: List<Ball>): Mat {
         balls.forEach { ball ->
-            Imgproc.circle(mat, ball.center, ball.radius, Scalar(255.0, 0.0, 255.0),
+            Imgproc.circle(mat, ball.circle.center, ball.circle.radius, Scalar(255.0, 0.0, 255.0),
                 3, 8, 0)
         }
         return mat

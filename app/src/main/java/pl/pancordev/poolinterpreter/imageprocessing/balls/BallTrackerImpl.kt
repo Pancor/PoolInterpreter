@@ -12,28 +12,22 @@ class BallTrackerImpl {
 
     private var nextId = 0
 
-    private fun registerBall(ball: Ball) {
-        Timber.d("registerBall.nextId: $nextId")
-        trackedBalls[nextId] = ball
-        disappearedBallsCounter[nextId] = 0
-        nextId++
-    }
-
-    fun update(untrackedBalls: MutableList<Ball>): HashMap<Int, Ball> {
+    fun update(circles: List<Circle>): List<Ball> {
+        val untrackedCircles = mutableListOf(*circles.toTypedArray())
         Timber.d("-----------------Update started-----------------")
-        if (untrackedBalls.isEmpty()) {
+        if (untrackedCircles.isEmpty()) {
             Timber.d("Provided untracked ball list is empty")
             for(disappearedBall in disappearedBallsCounter) {
                 disappearedBall.setValue(disappearedBall.value + 1)
             }
-            return trackedBalls
+            return trackedBalls.values.toList()
         }
         if (trackedBalls.isEmpty()) {
             Timber.d("Tracked balls are empty")
-            for (untrackedBall in untrackedBalls) {
+            for (untrackedBall in untrackedCircles) {
                 registerBall(untrackedBall)
             }
-            return trackedBalls
+            return trackedBalls.values.toList()
         }
 
         val trackedBallIndexes = mutableListOf<Int>()
@@ -42,30 +36,30 @@ class BallTrackerImpl {
         }
 
         val untrackedBallsWithDistance: MutableList<UntrackedBallWithDistances> = mutableListOf()
-        for (untrackedBall in untrackedBalls) {
+        for (untrackedCircle in untrackedCircles) {
             val distancesToBall = LinkedList<BallWithDistance>()
             for ((id, trackedBall) in trackedBalls) {
-                val distance = Math.sqrt(Math.pow(untrackedBall.center.x - trackedBall.center.x, 2.0) +
-                        Math.pow(untrackedBall.center.y - trackedBall.center.y, 2.0))
+                val distance = Math.sqrt(Math.pow(untrackedCircle.center.x - trackedBall.circle.center.x, 2.0) +
+                        Math.pow(untrackedCircle.center.y - trackedBall.circle.center.y, 2.0))
                 distancesToBall.add(BallWithDistance(id, trackedBall, distance))
             }
             distancesToBall.sortBy { it.distance }
-            untrackedBallsWithDistance.add(UntrackedBallWithDistances(untrackedBall, distancesToBall))
+            untrackedBallsWithDistance.add(UntrackedBallWithDistances(untrackedCircle, distancesToBall))
         }
-        untrackedBallsWithDistance.sortBy { it.distancesToBall[0].distance }
+        untrackedBallsWithDistance.sortBy { it.distancesToCircle[0].distance }
 
 
         for (untrackedBallWithDistance in untrackedBallsWithDistance) {
-            if (untrackedBallWithDistance.distancesToBall.isNotEmpty()) {
-                val trackedBallId = untrackedBallWithDistance.distancesToBall[0].id
-                trackedBalls[trackedBallId] = untrackedBallWithDistance.untrackedBall
+            if (untrackedBallWithDistance.distancesToCircle.isNotEmpty()) {
+                val trackedBallId = untrackedBallWithDistance.distancesToCircle[0].id
+                trackedBalls[trackedBallId]!!.circle = untrackedBallWithDistance.untrackedCircle
                 val disappeared = disappearedBallsCounter.getValue(trackedBallId)
                 disappearedBallsCounter[trackedBallId] = disappeared + 1
-                untrackedBalls.remove(untrackedBallWithDistance.untrackedBall)
+                untrackedCircles.remove(untrackedBallWithDistance.untrackedCircle)
                 trackedBallIndexes.remove(trackedBallId)
 
                 for (nestedUntrackedBallsWithDistance in untrackedBallsWithDistance) {
-                    val iterator = nestedUntrackedBallsWithDistance.distancesToBall.iterator()
+                    val iterator = nestedUntrackedBallsWithDistance.distancesToCircle.iterator()
                     while (iterator.hasNext()) {
                         val distanceToBall = iterator.next()
                         if (distanceToBall.id == trackedBallId) {
@@ -76,7 +70,7 @@ class BallTrackerImpl {
             }
         }
 
-        for (newBall in untrackedBalls) {
+        for (newBall in untrackedCircles) {
             registerBall(newBall)
         }
 
@@ -89,10 +83,17 @@ class BallTrackerImpl {
             }
         }
 
-        return trackedBalls
+        return trackedBalls.values.toList()
     }
 
-    private data class UntrackedBallWithDistances(val untrackedBall: Ball, val distancesToBall: LinkedList<BallWithDistance>)
+    private fun registerBall(circle: Circle) {
+        Timber.d("registerBall.nextId: $nextId")
+        trackedBalls[nextId] = Ball(nextId, circle)
+        disappearedBallsCounter[nextId] = 0
+        nextId++
+    }
+
+    private data class UntrackedBallWithDistances(val untrackedCircle: Circle, val distancesToCircle: LinkedList<BallWithDistance>)
 
     private data class BallWithDistance(val id: Int, val trackedBall: Ball, val distance: Double)
 }
